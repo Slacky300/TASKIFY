@@ -8,7 +8,10 @@ const createTask = async (req, res) => {
             title,
             description
         } = req.body;
-        const newTask = await Task.create({
+        if(!title){
+            return res.status(400).json({"message": "Title is mandatory"});
+        }
+         const newTask = await Task.create({
             title,
             description,
             creator: req.user.id
@@ -148,6 +151,10 @@ const completeTask = async (req, res) => {
         if (doesTaskExists.creator.toString() !== req.user.id) return res.status(401).json({
             message: "You're not authorized to complete this task"
         });
+
+        if(doesTaskExists.completed){
+            return res.status(200).json({message: "Task is already completed"});
+        }
 
         doesTaskExists.completed = true;
         await doesTaskExists.save();
